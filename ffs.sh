@@ -32,3 +32,5 @@ sudo dnf install teams -y
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak update
 flatpak install spotify
+sudo systemctl set-default graphical.target
+sudo reboot
