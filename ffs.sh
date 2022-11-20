@@ -29,6 +29,7 @@ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 dnf check-update
 sudo dnf install code -y
 sudo dnf install teams -y
+sudo dnf install libcxx kdenlive gimp -y 
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak update
 flatpak install spotify
