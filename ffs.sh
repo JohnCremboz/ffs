@@ -15,7 +15,7 @@ sudo dnf install celluloid -y
 sudo dnf install libreoffice -y
 sudo dnf install btop -y
 sudo dnf install gnome-shell gnome-tweaks gnome-shell-extensions-app -y
-sudo dnf install gnome-shell-extensions-appindicator -y
+sudo dnf install gnome-shell-extensions-appindicator gnome-disk-utility -y
 sudo dnf install nemo -y
 sudo dnf install wine -y
 sudo dnf install steam -y
