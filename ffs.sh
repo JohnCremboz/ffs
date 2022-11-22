@@ -14,7 +14,7 @@ sudo dnf install firefox -y
 sudo dnf install celluloid -y
 sudo dnf install libreoffice -y
 sudo dnf install btop -y
-sudo dnf install gnome-shell gnome-tweaks gnome-shell-extensions-app -y
+sudo dnf install gnome-shell gnome-tweaks -y
 sudo dnf install gnome-shell-extensions-appindicator gnome-disk-utility gnome-software -y
 sudo dnf install nemo -y
 sudo dnf install wine -y
@@ -25,7 +25,6 @@ sudo dnf install solaar -y
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
 sudo sh -c 'echo -e "[teams]\nname=teams\nbaseurl=https://packages.microsoft.com/yumrepos/ms-teams\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/teams.repo'
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 dnf check-update
 sudo dnf install code -y
 sudo dnf install teams -y
