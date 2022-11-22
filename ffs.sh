@@ -15,6 +15,7 @@ sudo dnf install celluloid -y
 sudo dnf install libreoffice -y
 sudo dnf install btop -y
 sudo dnf install gnome-shell -y 
+sudo dnf install f33-backgrounds -y
 sudo dnf install gnome-tweaks -y
 sudo dnf install gnome-extensions-app -y
 sudo dnf install gnome-shell-extension-appindicator -y 
