@@ -14,8 +14,8 @@ sudo dnf install firefox -y
 sudo dnf install celluloid -y
 sudo dnf install libreoffice -y
 sudo dnf install btop -y
-sudo dnf install gnome-shell gnome-tweaks -y
-sudo dnf install gnome-shell-extensions-appindicator gnome-disk-utility gnome-software -y
+sudo dnf install gnome-shell gnome-tweaks gnome-shell-extension gnome-shell extension-appindicator gnome-shell-theme-selene -y
+sudo dnf install gnome-shell-extention-freon gnome-disk-utility gnome-software -y
 sudo dnf install nemo -y
 sudo dnf install wine -y
 sudo dnf install steam -y
