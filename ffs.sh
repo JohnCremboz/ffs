@@ -16,7 +16,7 @@ sudo dnf install libreoffice -y
 sudo dnf install btop -y
 sudo dnf install gnome-shell -y 
 sudo dnf install gnome-tweaks -y
-sudo dnf install gnome-shell-extensions-app -y
+sudo dnf install gnome-extensions-app -y
 sudo dnf install gnome-shell-extension-appindicator -y 
 sudo dnf install gnome-shell-extension-freon -y
 sudo dnf install gnome-disk-utility -y
