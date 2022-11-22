@@ -18,8 +18,7 @@ sudo dnf install gnome-shell -y
 sudo dnf install gnome-tweaks -y
 sudo dnf install gnome-shell-extensions-app -y
 sudo dnf install gnome-shell-extension-appindicator -y 
-sudo dnf install gnome-shell-theme-selene -y
-sudo dnf install gnome-shell-extention-freon -y
+sudo dnf install gnome-shell-extension-freon -y
 sudo dnf install gnome-disk-utility -y
 sudo dnf install gnome-software -y
 sudo dnf install nemo -y
