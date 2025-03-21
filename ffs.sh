@@ -1,10 +1,14 @@
 #!/bin/bash
 
+# Enable debug mode
+set -x
+
 # Detect the distribution
 detect_distro() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         DISTRO=$ID
+        echo "Detected distribution: $DISTRO"
     else
         echo "Unsupported distribution"
         exit 1
@@ -34,11 +38,13 @@ show_menu() {
     17 "Exit" 2>tempfile
 
     choice=$(<tempfile)
+    echo "User selected option: $choice"
     rm -f tempfile
 }
 
 # Function to install selected components
 install_components() {
+    echo "Installing components for option: $1"
     case $1 in
         1)
             if [ "$DISTRO" = "fedora" ]; then
@@ -267,6 +273,7 @@ install_components() {
             5 "XFCE" 2>tempfile
 
             de_choice=$(<tempfile)
+            echo "User selected desktop environment: $de_choice"
             rm -f tempfile
 
             case $de_choice in
