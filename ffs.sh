@@ -11,26 +11,30 @@ detect_distro() {
     fi
 }
 
-# Function to display the menu
+# Function to display the menu using dialog
 show_menu() {
-    echo "Choose components to install:"
-    echo "1) Upgrade system"
-    echo "2) Install Fedora workstation repositories"
-    echo "3) Install RPM Fusion repositories"
-    echo "4) Update core, multimedia, and sound-and-video groups"
-    echo "5) Install additional packages"
-    echo "6) Install Microsoft repositories and packages"
-    echo "7) Install Flatpak and Spotify"
-    echo "8) Set default target to graphical and reboot"
-    echo "9) Install MS Edge"
-    echo "10) Install Steam"
-    echo "11) Install Google Chrome"
-    echo "12) Install NVtop"
-    echo "13) Install btop"
-    echo "14) Install Wine"
-    echo "15) Install Nvidia drivers and CUDA"
-    echo "16) Install Desktop Environment"
-    echo "17) Exit"
+    dialog --clear --title "Choose components to install" \
+    --menu "Select an option:" 15 50 17 \
+    1 "Upgrade system" \
+    2 "Install Fedora workstation repositories" \
+    3 "Install RPM Fusion repositories" \
+    4 "Update core, multimedia, and sound-and-video groups" \
+    5 "Install additional packages" \
+    6 "Install Microsoft repositories and packages" \
+    7 "Install Flatpak and Spotify" \
+    8 "Set default target to graphical and reboot" \
+    9 "Install MS Edge" \
+    10 "Install Steam" \
+    11 "Install Google Chrome" \
+    12 "Install NVtop" \
+    13 "Install btop" \
+    14 "Install Wine" \
+    15 "Install Nvidia drivers and CUDA" \
+    16 "Install Desktop Environment" \
+    17 "Exit" 2>tempfile
+
+    choice=$(<tempfile)
+    rm -f tempfile
 }
 
 # Function to install selected components
@@ -254,13 +258,17 @@ install_components() {
             fi
             ;;
         16)
-            echo "Choose a desktop environment:"
-            echo "1) Gnome"
-            echo "2) KDE"
-            echo "3) Cinnamon"
-            echo "4) COSMIC"
-            echo "5) XFCE"
-            read -p "Enter your choice [1-5]: " de_choice
+            dialog --clear --title "Choose a desktop environment" \
+            --menu "Select an option:" 15 50 5 \
+            1 "Gnome" \
+            2 "KDE" \
+            3 "Cinnamon" \
+            4 "COSMIC" \
+            5 "XFCE" 2>tempfile
+
+            de_choice=$(<tempfile)
+            rm -f tempfile
+
             case $de_choice in
                 1)
                     if [ "$DISTRO" = "fedora" ]; then
@@ -335,6 +343,5 @@ install_components() {
 detect_distro
 while true; do
     show_menu
-    read -p "Enter your choice [1-17]: " choice
     install_components $choice
 done
