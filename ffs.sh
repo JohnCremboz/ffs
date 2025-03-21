@@ -3,6 +3,9 @@
 # Enable debug mode
 set -x
 
+# Make the script executable
+chmod +x "$0"
+
 # Detect the distribution
 detect_distro() {
     if [ -f /etc/os-release ]; then
@@ -40,6 +43,19 @@ show_menu() {
     choice=$(<tempfile)
     echo "User selected option: $choice"
     rm -f tempfile
+}
+
+# Function to disable any existing desktop manager
+disable_existing_dm() {
+    if systemctl is-active --quiet gdm; then
+        sudo systemctl disable gdm
+    elif systemctl is-active --quiet gdm3; then
+        sudo systemctl disable gdm3
+    elif systemctl is-active --quiet sddm; then
+        sudo systemctl disable sddm
+    elif systemctl is-active --quiet lightdm; then
+        sudo systemctl disable lightdm
+    fi
 }
 
 # Function to install selected components
@@ -276,38 +292,64 @@ install_components() {
             echo "User selected desktop environment: $de_choice"
             rm -f tempfile
 
+            disable_existing_dm
+
             case $de_choice in
                 1)
                     if [ "$DISTRO" = "fedora" ]; then
                         sudo dnf groupinstall "GNOME Desktop Environment" -y
+                        sudo systemctl enable gdm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "ubuntu" ]; then
                         sudo apt install ubuntu-gnome-desktop -y
+                        sudo systemctl enable gdm3
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "arch" ]; then
                         sudo pacman -S gnome gnome-extra --noconfirm
+                        sudo systemctl enable gdm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "opensuse" ]; then
                         sudo zypper install -t pattern gnome gnome_basic
+                        sudo systemctl enable gdm
+                        sudo systemctl set-default graphical.target
                     fi
                     ;;
                 2)
                     if [ "$DISTRO" = "fedora" ]; then
                         sudo dnf groupinstall "KDE Plasma Workspaces" -y
+                        sudo systemctl enable sddm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "ubuntu" ]; then
                         sudo apt install kubuntu-desktop -y
+                        sudo systemctl enable sddm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "arch" ]; then
                         sudo pacman -S plasma kde-applications --noconfirm
+                        sudo systemctl enable sddm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "opensuse" ]; then
                         sudo zypper install -t pattern kde kde_plasma
+                        sudo systemctl enable sddm
+                        sudo systemctl set-default graphical.target
                     fi
                     ;;
                 3)
                     if [ "$DISTRO" = "fedora" ]; then
                         sudo dnf groupinstall "Cinnamon Desktop" -y
+                        sudo systemctl enable lightdm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "ubuntu" ]; then
                         sudo apt install cinnamon-desktop-environment -y
+                        sudo systemctl enable lightdm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "arch" ]; then
                         sudo pacman -S cinnamon --noconfirm
+                        sudo systemctl enable lightdm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "opensuse" ]; then
                         sudo zypper install cinnamon
+                        sudo systemctl enable lightdm
+                        sudo systemctl set-default graphical.target
                     fi
                     ;;
                 4)
@@ -317,6 +359,8 @@ install_components() {
                         echo "COSMIC is not available for Ubuntu"
                     elif [ "$DISTRO" = "arch" ]; then
                         sudo pacman -S cosmic --noconfirm
+                        sudo systemctl enable lightdm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "opensuse" ]; then
                         echo "COSMIC is not available for OpenSUSE"
                     fi
@@ -324,12 +368,20 @@ install_components() {
                 5)
                     if [ "$DISTRO" = "fedora" ]; then
                         sudo dnf groupinstall "Xfce Desktop" -y
+                        sudo systemctl enable lightdm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "ubuntu" ]; then
                         sudo apt install xubuntu-desktop -y
+                        sudo systemctl enable lightdm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "arch" ]; then
                         sudo pacman -S xfce4 xfce4-goodies --noconfirm
+                        sudo systemctl enable lightdm
+                        sudo systemctl set-default graphical.target
                     elif [ "$DISTRO" = "opensuse" ]; then
                         sudo zypper install -t pattern xfce xfce_basis
+                        sudo systemctl enable lightdm
+                        sudo systemctl set-default graphical.target
                     fi
                     ;;
                 *)
