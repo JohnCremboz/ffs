@@ -58,17 +58,15 @@ disable_existing_dm() {
     fi
 }
 
-# Function to show a progress bar
+# Function to show a graphical progress bar with yellow blocks
 show_progress() {
     local duration=$1
-    local interval=1
-    local elapsed=0
-    while [ $elapsed -lt $duration ]; do
-        elapsed=$((elapsed + interval))
-        echo -ne "Progress: $((elapsed * 100 / duration))%\r"
-        sleep $interval
-    done
-    echo -ne "\n"
+    (
+        for ((i = 0; i <= 100; i += 10)); do
+            echo $i
+            sleep $((duration / 10))
+        done
+    ) | dialog --gauge "Please wait..." 10 70 0 --backtitle "Progress" --colors --title "\Zb\Z1Progress Bar" --gauge "\Zb\Z3Please wait..." 10 70 0
 }
 
 # Function to install selected components
