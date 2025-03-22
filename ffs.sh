@@ -58,9 +58,23 @@ disable_existing_dm() {
     fi
 }
 
+# Function to show a progress bar
+show_progress() {
+    local duration=$1
+    local interval=1
+    local elapsed=0
+    while [ $elapsed -lt $duration ]; do
+        elapsed=$((elapsed + interval))
+        echo -ne "Progress: $((elapsed * 100 / duration))%\r"
+        sleep $interval
+    done
+    echo -ne "\n"
+}
+
 # Function to install selected components
 install_components() {
     echo "Installing components for option: $1"
+    show_progress 10  # Show progress bar for 10 seconds
     case $1 in
         1)
             if [ "$DISTRO" = "fedora" ]; then
@@ -404,3 +418,6 @@ while true; do
     show_menu
     install_components $choice
 done
+
+# Clear the screen on exit
+clear
