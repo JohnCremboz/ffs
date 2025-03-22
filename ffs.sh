@@ -58,21 +58,9 @@ disable_existing_dm() {
     fi
 }
 
-# Function to show a graphical progress bar with yellow blocks
-show_progress() {
-    local duration=$1
-    (
-        for ((i = 0; i <= 100; i += 10)); do
-            echo $i
-            sleep $((duration / 10))
-        done
-    ) | dialog --gauge "Please wait..." 10 70 0 --backtitle "Progress" --colors --title "\Zb\Z1Progress Bar" --gauge "\Zb\Z3Please wait..." 10 70 0
-}
-
 # Function to install selected components
 install_components() {
     echo "Installing components for option: $1"
-    show_progress 10  # Show progress bar for 10 seconds
     case $1 in
         1)
             if [ "$DISTRO" = "fedora" ]; then
