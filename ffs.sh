@@ -316,72 +316,78 @@ install_components() {
                     ;;
                 2)
                     if [ "$DISTRO" = "fedora" ]; then
-                        sudo dnf groupinstall "KDE Plasma Workspaces" -y
-                        sudo systemctl enable sddm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "kde" \
+                            "dnf groupinstall 'KDE Plasma Workspaces' -y" \
+                            "sddm"
                     elif [ "$DISTRO" = "ubuntu" ]; then
-                        sudo apt install kubuntu-desktop -y
-                        sudo systemctl enable sddm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "kde" \
+                            "apt install kubuntu-desktop -y" \
+                            "sddm"
                     elif [ "$DISTRO" = "arch" ]; then
-                        sudo pacman -S plasma kde-applications --noconfirm
-                        sudo systemctl enable sddm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "kde" \
+                            "pacman -S plasma kde-applications --noconfirm" \
+                            "sddm"
                     elif [ "$DISTRO" = "opensuse" ]; then
-                        sudo zypper install -t pattern kde kde_plasma
-                        sudo systemctl enable sddm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "kde" \
+                            "zypper install -t pattern kde kde_plasma" \
+                            "sddm"
                     fi
                     ;;
                 3)
                     if [ "$DISTRO" = "fedora" ]; then
-                        sudo dnf groupinstall "Cinnamon Desktop" -y
-                        sudo systemctl enable lightdm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "cinnamon" \
+                            "dnf groupinstall 'Cinnamon Desktop' -y" \
+                            "lightdm"
                     elif [ "$DISTRO" = "ubuntu" ]; then
-                        sudo apt install cinnamon-desktop-environment -y
-                        sudo systemctl enable lightdm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "cinnamon" \
+                            "apt install cinnamon-desktop-environment -y" \
+                            "lightdm"
                     elif [ "$DISTRO" = "arch" ]; then
-                        sudo pacman -S cinnamon --noconfirm
-                        sudo systemctl enable lightdm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "cinnamon" \
+                            "pacman -S cinnamon --noconfirm" \
+                            "lightdm"
                     elif [ "$DISTRO" = "opensuse" ]; then
-                        sudo zypper install cinnamon
-                        sudo systemctl enable lightdm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "cinnamon" \
+                            "zypper install cinnamon" \
+                            "lightdm"
                     fi
                     ;;
                 4)
-                    if [ "$DISTRO" = "fedora" ]; then
-                        echo "COSMIC is not available for Fedora"
-                    elif [ "$DISTRO" = "ubuntu" ]; then
-                        echo "COSMIC is not available for Ubuntu"
-                    elif [ "$DISTRO" = "arch" ]; then
-                        sudo pacman -S cosmic --noconfirm
-                        sudo systemctl enable lightdm
-                        sudo systemctl set-default graphical.target
-                    elif [ "$DISTRO" = "opensuse" ]; then
-                        echo "COSMIC is not available for OpenSUSE"
+                    if [ "$DISTRO" = "arch" ]; then
+                        # Check if yay is installed for AUR access
+                        if ! command -v yay >/dev/null 2>&1; then
+                            echo "Installing yay AUR helper..."
+                            sudo pacman -S --needed git base-devel
+                            git clone https://aur.archlinux.org/yay.git
+                            cd yay && makepkg -si --noconfirm
+                            cd .. && rm -rf yay
+                        fi
+                        install_desktop_environment "cosmic" \
+                            "yay -S cosmic-desktop --noconfirm" \
+                            "gdm"
+                    else
+                        echo "COSMIC is only available for Arch Linux"
+                        logger "Attempted COSMIC installation on unsupported distro: $DISTRO"
+                        sleep 2
                     fi
                     ;;
                 5)
                     if [ "$DISTRO" = "fedora" ]; then
-                        sudo dnf groupinstall "Xfce Desktop" -y
-                        sudo systemctl enable lightdm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "xfce" \
+                            "dnf groupinstall 'Xfce Desktop' -y" \
+                            "lightdm"
                     elif [ "$DISTRO" = "ubuntu" ]; then
-                        sudo apt install xubuntu-desktop -y
-                        sudo systemctl enable lightdm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "xfce" \
+                            "apt install xubuntu-desktop -y" \
+                            "lightdm"
                     elif [ "$DISTRO" = "arch" ]; then
-                        sudo pacman -S xfce4 xfce4-goodies --noconfirm
-                        sudo systemctl enable lightdm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "xfce" \
+                            "pacman -S xfce4 xfce4-goodies --noconfirm" \
+                            "lightdm"
                     elif [ "$DISTRO" = "opensuse" ]; then
-                        sudo zypper install -t pattern xfce xfce_basis
-                        sudo systemctl enable lightdm
-                        sudo systemctl set-default graphical.target
+                        install_desktop_environment "xfce" \
+                            "zypper install -t pattern xfce xfce_basis" \
+                            "lightdm"
                     fi
                     ;;
                 *)
@@ -396,6 +402,61 @@ install_components() {
             echo "Invalid option"
             ;;
     esac
+}
+
+# Add this function near the top of the file, after detect_distro()
+install_desktop_environment() {
+    local de_name=$1
+    local install_cmd=$2
+    local display_manager=$3
+
+    # Log installation start
+    logger "Starting installation of $de_name desktop environment"
+    echo "Installing $de_name desktop environment..."
+
+    # Install display manager package if needed
+    if [ "$display_manager" = "lightdm" ]; then
+        echo "Installing LightDM display manager..."
+        case "$DISTRO" in
+            fedora) sudo dnf install lightdm -y ;;
+            ubuntu) sudo apt install lightdm -y ;;
+            arch) sudo pacman -S lightdm lightdm-gtk-greeter --noconfirm ;;
+            opensuse) sudo zypper install lightdm -y ;;
+        esac
+    fi
+
+    # Install desktop environment
+    if ! eval "sudo $install_cmd"; then
+        logger "Failed to install $de_name"
+        echo "Failed to install $de_name"
+        return 1
+    fi
+
+    echo "Configuring display manager..."
+    disable_existing_dm
+    if ! sudo systemctl enable "$display_manager"; then
+        logger "Failed to enable $display_manager"
+        echo "Failed to enable $display_manager"
+        return 1
+    fi
+
+    # Verify installation
+    if ! command -v "$de_name" >/dev/null 2>&1; then
+        logger "Warning: $de_name binary not found in PATH"
+        echo "Warning: Installation completed but $de_name not found in PATH"
+    fi
+
+    echo "Setting default target..."
+    if ! sudo systemctl set-default graphical.target; then
+        logger "Failed to set graphical target"
+        echo "Failed to set graphical target"
+        return 1
+    fi
+
+    logger "$de_name installation completed successfully"
+    echo "$de_name installation completed successfully"
+    sleep 2
+    return 0
 }
 
 # Main script
