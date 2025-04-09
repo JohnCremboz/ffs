@@ -50,7 +50,7 @@ detect_distro() {
 # Function to validate input
 validate_choice() {
     local input=$1
-    if ! [[ "$input" =~ ^[0-9]+$ ]] || [ "$input" -lt 1 ] || [ "$input" -gt 17 ]; then
+    if ! [[ "$input" =~ ^[0-9]+$ ]] || [ "$input" -lt 1 ] || [ "$input" -gt 18 ]; then
         echo "Invalid option: $input" >&2
         return 1
     fi
@@ -61,7 +61,7 @@ validate_choice() {
 show_menu() {
     local choice
     choice=$(dialog --clear --title "Choose components to install" \
-    --menu "Select an option:" 15 50 17 \
+    --menu "Select an option:" 17 50 18 \
     1 "Upgrade system" \
     2 "Install Fedora workstation repositories" \
     3 "Install RPM Fusion repositories" \
@@ -78,7 +78,8 @@ show_menu() {
     14 "Install Wine" \
     15 "Install Nvidia drivers and CUDA" \
     16 "Install Desktop Environment" \
-    17 "Exit" 2>&1 >/dev/tty)
+    17 "Execute options 1-15 sequentially" \
+    18 "Exit" 2>&1 >/dev/tty)
 
     echo "$choice"
 }
@@ -428,6 +429,11 @@ install_components() {
             esac
             ;;
         17)
+            for i in $(seq 1 15); do
+                install_components "$i"
+            done
+            ;;
+        18)
             exit 0
             ;;
         *)
@@ -443,7 +449,7 @@ while true; do
     if [ -n "$choice" ]; then
         if validate_choice "$choice"; then
             install_components "$choice"
-            [ "$choice" -eq 17 ] && exit 0
+            [ "$choice" -eq 18 ] && exit 0
         fi
     fi
 done
