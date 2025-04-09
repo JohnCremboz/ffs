@@ -1,7 +1,24 @@
 #!/bin/bash
 
 # Enable debug mode
-set -x
+set -e  # Exit on error
+set -u  # Exit on undefined variable
+
+# Setup logging
+LOG_FILE="/tmp/ffs_install.log"
+exec 1> >(tee -a "$LOG_FILE")
+exec 2> >(tee -a "$LOG_FILE" >&2)
+
+# Cleanup function
+cleanup() {
+    local exit_code=$?
+    clear
+    rm -f tempfile
+    exit $exit_code
+}
+
+# Set trap for cleanup
+trap cleanup EXIT
 
 # Make the script executable
 chmod +x "$0"
@@ -18,9 +35,20 @@ detect_distro() {
     fi
 }
 
+# Function to validate input
+validate_choice() {
+    local input=$1
+    if ! [[ "$input" =~ ^[0-9]+$ ]] || [ "$input" -lt 1 ] || [ "$input" -gt 17 ]; then
+        echo "Invalid option: $input" >&2
+        return 1
+    fi
+    return 0
+}
+
 # Function to display the menu using dialog
 show_menu() {
-    dialog --clear --title "Choose components to install" \
+    local choice
+    choice=$(dialog --clear --title "Choose components to install" \
     --menu "Select an option:" 15 50 17 \
     1 "Upgrade system" \
     2 "Install Fedora workstation repositories" \
@@ -38,11 +66,9 @@ show_menu() {
     14 "Install Wine" \
     15 "Install Nvidia drivers and CUDA" \
     16 "Install Desktop Environment" \
-    17 "Exit" 2>tempfile
+    17 "Exit" 2>&1 >/dev/tty)
 
-    choice=$(<tempfile)
-    echo "User selected option: $choice"
-    rm -f tempfile
+    echo "$choice"
 }
 
 # Function to disable any existing desktop manager
@@ -401,9 +427,11 @@ install_components() {
 # Main script
 detect_distro
 while true; do
-    show_menu
-    install_components $choice
+    choice=$(show_menu)
+    if [ -n "$choice" ]; then
+        if validate_choice "$choice"; then
+            install_components "$choice"
+            [ "$choice" -eq 17 ] && exit 0
+        fi
+    fi
 done
-
-# Clear the screen on exit
-clear
