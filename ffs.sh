@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check if superuser
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root" 
+   exit 1
+fi
+
 # Enable debug mode
 set -e  # Exit on error
 set -u  # Exit on undefined variable
@@ -14,6 +20,12 @@ cleanup() {
     local exit_code=$?
     clear
     rm -f tempfile
+
+    # Ensure lightdm is enabled
+    if ! systemctl is-enabled --quiet lightdm; then
+        sudo systemctl enable lightdm
+    fi
+
     exit $exit_code
 }
 
